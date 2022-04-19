@@ -1,5 +1,6 @@
 ﻿using Inventory_PushService.Data.Entities;
 using Inventory_PushService.Data.Repositories;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +13,13 @@ namespace Inventory_PushService
     {
         private readonly ISubscriptionRepository _subscriptionRepository;
         private readonly IReminderRepository _reminderRepository;
+        private readonly IConfigurationRoot _configuration;
 
-        public PushTimer(ISubscriptionRepository subscriptionRepository, IReminderRepository reminderRepository)
+        public PushTimer(ISubscriptionRepository subscriptionRepository, IReminderRepository reminderRepository, IConfigurationRoot configuration)
         {
             _subscriptionRepository = subscriptionRepository;
             _reminderRepository = reminderRepository;
+            _configuration = configuration;
         }
 
         public async Task Start()
@@ -87,7 +90,7 @@ namespace Inventory_PushService
                 IEnumerable<Subscription> subscriptions = await GetAllSubscriptions(reminder.Author.Username);
                 foreach (var subscription in subscriptions)
                 {
-                    PushService.Push(subscription, reminder.Reason);
+                    PushService.Push(subscription, reminder.Reason, _configuration);
                 }
                 await UpdateReminder(reminder);
             }

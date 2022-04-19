@@ -1,5 +1,6 @@
 ﻿using Inventory_PushService.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Configuration;
 using System.Data;
@@ -9,11 +10,11 @@ namespace Inventory_PushService.Data
 {
     public class RestContext : DbContext
     {
-        public RestContext()
+        public RestContext(IConfigurationRoot configuration)
         {
-            //Configuration = configuration;
+            Configuration = configuration;
         }
-       // public IConfiguration Configuration { get; private set; }
+        public IConfigurationRoot Configuration { get; private set; }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Item> Items { get; set; }
@@ -25,7 +26,7 @@ namespace Inventory_PushService.Data
             modelBuilder.Entity<User>(entity => { entity.HasIndex(e => e.Username).IsUnique(); });
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder dbContextOptionsBuilder) => dbContextOptionsBuilder.UseSqlServer(ConfigurationManager.ConnectionStrings["MainDBConnection"].ConnectionString);
+        protected override void OnConfiguring(DbContextOptionsBuilder dbContextOptionsBuilder) => dbContextOptionsBuilder.UseSqlServer(Configuration["MainDBConnection"]);
 
     }
 }

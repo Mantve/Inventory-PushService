@@ -4,17 +4,18 @@ using System.Collections.Generic;
 using System.Text.Json;
 using WebPush;
 using System.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace Inventory_PushService
 {
     public static class PushService
     {
 
-        public static void Push(Subscription subscription, string reason)
+        public static void Push(Subscription subscription, string reason, IConfigurationRoot configuration)
         {
             WebPushClient webPushClient = new();
-            var encryptionKey = System.Text.Encoding.UTF8.GetBytes(ConfigurationManager.AppSettings.Get("encryptionKey"));
-            var iv = System.Text.Encoding.UTF8.GetBytes(ConfigurationManager.AppSettings.Get("iv"));
+            var encryptionKey = System.Text.Encoding.UTF8.GetBytes(configuration["encryptionKey"]);
+            var iv = System.Text.Encoding.UTF8.GetBytes(configuration["iv"]);
             PushSubscription pushSubscription = new(
                 CryptographyHelper.DecryptStringFromBytes_Aes(subscription.Endpoint, encryptionKey, iv),
                 CryptographyHelper.DecryptStringFromBytes_Aes(subscription.P256dh, encryptionKey, iv),
